@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Путь Самурая</title>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: "Segoe UI", sans-serif;
+        background: #000;
+        color: #e6e6e6;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    .neo-symbols {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        background:
+            repeating-linear-gradient(
+                90deg,
+                rgba(255,0,0,0.08) 0px,
+                rgba(255,0,0,0.08) 2px,
+                transparent 2px,
+                transparent 8px
+            ),
+            repeating-linear-gradient(
+                0deg,
+                rgba(255,0,0,0.05) 0px,
+                rgba(255,0,0,0.05) 2px,
+                transparent 2px,
+                transparent 8px
+            );
+        animation: gridMove 12s linear infinite;
+        transition: transform 0.2s ease-out;
+    }
+
+    @keyframes gridMove {
+        from { transform: translateX(0); }
+        to { transform: translateX(-200px); }
+    }
+
+    .card {
+        background: rgba(10,10,10,0.85);
+        border: 1px solid rgba(255,0,0,0.3);
+        padding: 35px 25px;
+        border-radius: 14px;
+        box-shadow: 0 0 40px rgba(255,0,0,0.25);
+        text-align: center;
+        max-width: 420px;
+        width: 90%;
+        backdrop-filter: blur(6px);
+        position: relative;
+        z-index: 2;
+        animation: fadeIn 0.8s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .btn {
+        padding: 14px 28px;
+        background: rgba(255,0,0,0.25);
+        border: 1px solid rgba(255,0,0,0.6);
+        color: #ff4d4d;
+        border-radius: 50px;
+        font-weight: bold;
+        text-decoration: none;
+        cursor: pointer;
+        display: inline-block;
+        margin-top: 20px;
+        box-shadow: 0 0 20px rgba(255,0,0,0.35);
+        transition: 0.3s;
+    }
+
+    .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0 35px rgba(255,0,0,0.6);
+    }
+
+    #modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.7);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 3;
+    }
+
+    .modal-content {
+        background: #111;
+        padding: 25px;
+        border-radius: 12px;
+        text-align: center;
+        width: 80%;
+        max-width: 350px;
+        border: 1px solid rgba(255,0,0,0.3);
+        box-shadow: 0 0 25px rgba(255,0,0,0.4);
+    }
+
+    .modal-btn {
+        padding: 10px 20px;
+        margin: 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .confirm {
+        background: #b30000;
+        color: white;
+    }
+
+    .cancel {
+        background: #444;
+        color: white;
+    }
+
+    .countdown-container {
+        display: flex;
+        justify-content: space-around;
+        margin: 25px 0 15px;
+    }
+
+    .countdown-item {
+        background: rgba(255,0,0,0.05);
+        border: 1px solid rgba(255,0,0,0.4);
+        border-radius: 10px;
+        padding: 10px;
+        min-width: 65px;
+        box-shadow: 0 0 15px rgba(255,0,0,0.25);
+        text-align: center;
+    }
+
+    .countdown-time {
+        font-size: 30px;
+        font-weight: 700;
+        color: #ff1a1a;
+        font-family: "Consolas", monospace;
+        text-shadow: 0 0 10px rgba(255,0,0,0.6);
+    }
+
+    .countdown-label {
+        font-size: 12px;
+        color: #aaa;
+        margin-top: 5px;
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .coordinates {
+        font-size: 26px;
+        font-weight: 800;
+        color: #ff1a1a;
+        margin: 20px 0;
+        background: rgba(255,0,0,0.1);
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px dashed rgba(255,0,0,0.4);
+    }
+
+    #finalBlock {
+        display: none;
+        color: #fff;
+        text-shadow: 0 0 12px rgba(255,0,0,0.7);
+    }
+
+    .samurai-title {
+        font-size: 32px;
+        font-weight: 900;
+        color: #ff1a1a;
+        text-shadow: 0 0 20px rgba(255,0,0,0.7);
+        animation: pulse 2.5s ease-in-out infinite;
+        letter-spacing: 3px;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.07); }
+        100% { transform: scale(1); }
+    }
+
+    .kanji {
+        font-size: 60px;
+        color: #ff1a1a;
+        opacity: 0;
+        animation: kanjiAppear 3s ease-out forwards 1.5s;
+    }
+
+    @keyframes kanjiAppear {
+        0% { transform: translateY(20px); opacity: 0; }
+        100% { transform: translateY(0); opacity: 1; }
+    }
+
+    @media (max-width: 480px) {
+        .card { padding: 25px 20px; width: 92%; }
+        .countdown-time { font-size: 24px; }
+        .coordinates { font-size: 22px; padding: 12px; }
+        .btn { padding: 12px 20px; font-size: 15px; }
+        .samurai-title { font-size: 26px; }
+        .kanji { font-size: 48px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="neo-symbols" id="bg"></div>
+
+<div class="card">
+
+    <div id="start">
+        <p style="font-size: 18px; line-height: 1.6;">
+            Путь клинка начинается не с удара — а с подготовки.<br>
+            Сегодня тебе понадобится больше, чем решимость.<br><br>
+            Возьми лопату, удочку и активируй главное — свой боевой дух. Без него миссия не начнётся.<br><br>
+            Испытание ждёт тех, кто готов идти до конца.
+        </p>
+
+        <div class="btn" onclick="openModal()">Готов</div>
+
+        <p style="font-size: 13px; color:#888; margin-top:10px;">
+            Доступ появится после 16:30
+        </p>
+    </div>
+
+    <div id="timerBlock" style="display:none;">
+        <div class="coordinates">54.021217, 27.247295</div>
+
+        <a class="btn"
+           href="https://yandex.ru/maps/?pt=27.247295,54.021217&z=17&l=map"
+           target="_blank">
+            Открыть в Яндекс.Картах
+        </a>
+
+        <p style="font-size: 16px; margin-top: 20px; line-height: 1.5;">
+            Координаты получены.<br>
+            На месте тебя ждёт то, что скрыто под землёй.<br>
+            У тебя ровно два часа — время уже пошло.
+        </p>
+
+        <div class="countdown-container">
+            <div class="countdown-item">
+                <span id="days" class="countdown-time">00</span>
+                <span class="countdown-label">дн</span>
+            </div>
+            <div class="countdown-item">
+                <span id="hours" class="countdown-time">00</span>
+                <span class="countdown-label">час</span>
+            </div>
+            <div class="countdown-item">
+                <span id="minutes" class="countdown-time">00</span>
+                <span class="countdown-label">мин</span>
+            </div>
+            <div class="countdown-item">
+                <span id="seconds" class="countdown-time">00</span>
+                <span class="countdown-label">сек</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="finalBlock">
+        <div class="samurai-title">Миссия выполнена</div>
+        <div style="font-size: 18px; line-height: 1.6;">
+            <br>Ты прошёл путь клинка.<br><br>
+            Испытание окончено — награда у тебя в руках.<br>
+        </div>
+        <div class="kanji">侍の道</div>
+    </div>
+
+</div>
+
+<div id="modal">
+    <div class="modal-content">
+        <p id="modal-text">Ты готов ступить на путь?</p>
+        <div class="modal-btn confirm" onclick="confirmStart()">Да</div>
+        <div class="modal-btn cancel" onclick="closeModal()">Отмена</div>
+    </div>
+</div>
+
+<script>
+/* ФОН */
+const bg = document.getElementById("bg");
+
+function moveBG(x, y) {
+    const dx = (x / window.innerWidth - 0.5) * 20;
+    const dy = (y / window.innerHeight - 0.5) * 20;
+    bg.style.transform = `translate(${dx}px, ${dy}px)`;
+}
+
+document.addEventListener("mousemove", e => moveBG(e.clientX, e.clientY));
+document.addEventListener("touchmove", e => {
+    const t = e.touches[0];
+    moveBG(t.clientX, t.clientY);
+});
+
+/* МОДАЛКА */
+function openModal() {
+    document.getElementById('modal-text').innerText = "Ты готов ступить на путь?";
+    document.getElementById('modal').style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+}
+
+/* ТАЙМЕР */
+let countdownInterval;
+let targetDate = null;
+
+/* --- РЕАЛЬНОЕ ВРЕМЯ ЧЕРЕЗ ИНТЕРНЕТ --- */
+async function getRealTime() {
+    try {
+        const response = await fetch(
+            "https://timeapi.io/api/Time/current/zone?timeZone=Europe/Minsk"
+        );
+
+        const data = await response.json();
+
+        return new Date(
+            data.year,
+            data.month - 1,
+            data.day,
+            data.hour,
+            data.minute,
+            data.seconds
+        );
+    } catch (e) {
+        console.error("Ошибка получения времени:", e);
+        return null;
+    }
+}
+
+/* --- ПОДТВЕРЖДЕНИЕ СТАРТА --- */
+async function confirmStart() {
+    const realNow = await getRealTime();
+
+    if (!realNow) {
+        document.getElementById('modal-text').innerText =
+            "Не удалось получить время. Попробуй ещё раз.";
+        return;
+    }
+
+    const minStart = new Date(realNow);
+    minStart.setHours(16, 10, 0, 0);
+
+    if (realNow < minStart) {
+        document.getElementById('modal-text').innerText =
+            "Путь откроется после 16:30.";
+        return;
+    }
+
+    closeModal();
+    beginTimer(realNow);
+}
+
+/* --- ЗАПУСК ТАЙМЕРА --- */
+async function beginTimer(realNow) {
+    document.getElementById('start').style.display = 'none';
+    document.getElementById('timerBlock').style.display = 'block';
+
+    targetDate = new Date(realNow);
+    targetDate.setHours(17, 10, 0, 0);
+
+    if (realNow >= targetDate) {
+        showFinal();
+        return;
+    }
+
+    updateTimer();
+    countdownInterval = setInterval(updateTimer, 1000);
+}
+
+/* --- ОБНОВЛЕНИЕ ТАЙМЕРА --- */
+async function updateTimer() {
+    const realNow = await getRealTime();
+
+    if (!realNow) return;
+
+    const distance = targetDate - realNow;
+
+    if (distance <= 0) {
+        clearInterval(countdownInterval);
+        showFinal();
+        return;
+    }
+
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    document.getElementById("days").innerText = days.toString().padStart(2, "0");
+    document.getElementById("hours").innerText = hours.toString().padStart(2, "0");
+    document.getElementById("minutes").innerText = minutes.toString().padStart(2, "0");
+    document.getElementById("seconds").innerText = seconds.toString().padStart(2, "0");
+}
+
+/* --- ФИНАЛ --- */
+function showFinal() {
+    document.getElementById('timerBlock').style.display = 'none';
+    document.getElementById('finalBlock').style.display = 'block';
+}
+</script>
+
+</body>
+</html>
