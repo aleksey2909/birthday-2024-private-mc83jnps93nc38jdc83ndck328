@@ -247,7 +247,7 @@
         <p style="font-size: 16px; margin-top: 20px; line-height: 1.5;">
             Координаты получены.<br>
             На месте тебя ждёт то, что скрыто под землёй.<br>
-            У тебя ровно два часа — время уже пошло.
+            Время летит, как выпущенная стрела — успей добраться до цели до 17:30.
         </p>
 
         <div class="countdown-container">
@@ -353,7 +353,7 @@ async function confirmStart() {
     }
 
     const minStart = new Date(realNow);
-    minStart.setHours(16, 10, 0, 0);
+    minStart.setHours(16, 07, 0, 0);
 
     if (realNow < minStart) {
         document.getElementById('modal-text').innerText =
@@ -371,7 +371,7 @@ async function beginTimer(realNow) {
     document.getElementById('timerBlock').style.display = 'block';
 
     targetDate = new Date(realNow);
-    targetDate.setHours(17, 10, 0, 0);
+    targetDate.setHours(17, 07, 0, 0);
 
     if (realNow >= targetDate) {
         showFinal();
