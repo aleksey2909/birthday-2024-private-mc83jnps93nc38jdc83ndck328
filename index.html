@@ -76,7 +76,8 @@
 
 <h1>🎃 Хэллоуинский Конкурс 👻</h1>
 
-<div class="section">
+<!-- ЭКРАН ЗАГРУЗКИ -->
+<div id="uploadSection" class="section">
     <h2>Шаг 1: Загрузи свой образ</h2>
     <input type="text" id="username" placeholder="Введи свое имя или ник" required>
     <input type="file" id="photo" accept="image/*" required>
@@ -84,8 +85,17 @@
     <p id="status" style="color: #fff;"></p>
 </div>
 
-<h2>Шаг 2: Голосование за лучший костюм</h2>
-<div class="gallery" id="gallery"></div>
+<!-- ЭКРАН ОЖИДАНИЯ ДО ГОЛОСОВАНИЯ -->
+<div id="waitSection" class="section" style="display:none;">
+    <h2>Голосование будет доступно после 21:00</h2>
+    <p style="color:#fff;">Ты уже загрузил свой костюм. Возвращайся после 21:00, чтобы проголосовать!</p>
+</div>
+
+<!-- ЭКРАН ГОЛОСОВАНИЯ -->
+<div id="voteSection" style="display:none;">
+    <h2>Шаг 2: Голосование за лучший костюм</h2>
+    <div class="gallery" id="gallery"></div>
+</div>
 
 <script type="module">
     /* ---------- Firebase ---------- */
@@ -110,8 +120,43 @@
     /* ---------- Imgbb ---------- */
     const IMGBB_API_KEY = "40e3654baeb45b49e49e95961a64c5aa";
 
-    /* ---------- Upload participant ---------- */
+    /* ---------- ЛОГИКА ЭКРАНОВ ---------- */
+    function updateScreenState() {
+        const uploaded = localStorage.getItem("uploaded");
+        const now = new Date();
+        const hour = now.getHours();
+
+        const uploadSection = document.getElementById("uploadSection");
+        const waitSection = document.getElementById("waitSection");
+        const voteSection = document.getElementById("voteSection");
+
+        if (!uploaded) {
+            uploadSection.style.display = "block";
+            waitSection.style.display = "none";
+            voteSection.style.display = "none";
+            return;
+        }
+
+        uploadSection.style.display = "none";
+
+        if (hour < 21) {
+            waitSection.style.display = "block";
+            voteSection.style.display = "none";
+        } else {
+            waitSection.style.display = "none";
+            voteSection.style.display = "block";
+        }
+    }
+
+    updateScreenState();
+
+    /* ---------- ЗАГРУЗКА УЧАСТНИКА ---------- */
     document.getElementById("uploadBtn").onclick = async () => {
+        if (localStorage.getItem("uploaded")) {
+            alert("Вы уже загрузили фото с этого устройства!");
+            return;
+        }
+
         const name = document.getElementById("username").value.trim();
         const file = document.getElementById("photo").files[0];
         const status = document.getElementById("status");
@@ -152,6 +197,9 @@
             status.innerText = "🎃 Успех! Твой костюм в галерее.";
             document.getElementById("username").value = "";
             document.getElementById("photo").value = "";
+
+            localStorage.setItem("uploaded", "true");
+            updateScreenState();
         } catch (err) {
             console.error(err);
             status.innerText = "❌ Ошибка загрузки.";
@@ -160,7 +208,7 @@
         btn.disabled = false;
     };
 
-    /* ---------- Gallery ---------- */
+    /* ---------- ГАЛЕРЕЯ ---------- */
     const gallery = document.getElementById("gallery");
     const q = query(collection(db, "participants"), orderBy("votes", "desc"));
 
@@ -189,7 +237,7 @@
         });
     });
 
-    /* ---------- Vote ---------- */
+    /* ---------- ГОЛОСОВАНИЕ ---------- */
     window.vote = async (id) => {
         if (localStorage.getItem("halloween_voted")) {
             alert("Вы уже голосовали!");
@@ -200,6 +248,7 @@
             const ref = doc(db, "participants", id);
             await updateDoc(ref, { votes: increment(1) });
             localStorage.setItem("halloween_voted", "true");
+            updateScreenState();
         } catch (err) {
             console.error(err);
             alert("Ошибка голосования.");
