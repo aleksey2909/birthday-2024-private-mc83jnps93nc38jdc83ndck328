@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Хэллоуинский Конкурс Костюмов 🎃</title>
+    <title>Хэллоуинский Конкурс 🎃</title>
 
     <style>
         body {
@@ -104,9 +104,6 @@
         getFirestore, collection, addDoc, onSnapshot,
         updateDoc, doc, increment, query, orderBy, where, getDocs
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    import {
-        getStorage, ref, uploadBytes, getDownloadURL
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDkyFraWVn_Hp9tTZWGIKOeNFQKpAUzqSw",
@@ -119,7 +116,31 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const storage = getStorage(app);
+
+    /* ---------- Imgbb ---------- */
+    const IMGBB_API_KEY = "40e3654baeb45b49e49e95961a64c5aa"; // замени на свой
+    const IMGBB_UPLOAD_URL = "https://api.imgbb.com/1/upload";
+
+    async function uploadToImgbb(file) {
+        const formData = new FormData();
+        formData.append("image", file);
+        formData.append("key", IMGBB_API_KEY);
+        formData.append("expiration", "86400");
+
+        const res = await fetch(IMGBB_UPLOAD_URL, {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await res.json();
+        console.log("Imgbb response:", data);
+
+        if (!data.data || !data.data.url) {
+            throw new Error("Ошибка загрузки в Imgbb");
+        }
+
+        return data.data.url;
+    }
 
     /* ---------- IP ---------- */
     async function getUserIP() {
@@ -133,6 +154,8 @@
     }
 
     /* ---------- ЛОГИКА ЭКРАНОВ ---------- */
+    const DEV_MODE = false;
+
     function updateScreenState() {
         const uploaded = localStorage.getItem("uploaded");
         const now = new Date();
@@ -151,7 +174,7 @@
 
         uploadSection.style.display = "none";
 
-        if (hour < 21) {
+        if (!DEV_MODE && hour < 21) {
             waitSection.style.display = "block";
             voteSection.style.display = "none";
         } else {
@@ -174,8 +197,8 @@
             return;
         }
 
-        // защита: 1 IP = 1 загрузка
         const userIP = await getUserIP();
+
         const uploadCheckQuery = query(collection(db, "participants"), where("ip", "==", userIP));
         const uploadCheckSnap = await getDocs(uploadCheckQuery);
 
@@ -184,7 +207,6 @@
             return;
         }
 
-        // защита по устройству
         if (localStorage.getItem("uploaded")) {
             alert("Вы уже загрузили фото с этого устройства!");
             return;
@@ -194,13 +216,7 @@
         status.innerText = "🧙‍♂️ Загружаем фото...";
 
         try {
-            const fileName = `${Date.now()}_${file.name}`;
-            const storageRef = ref(storage, "photos/" + fileName);
-
-            await uploadBytes(storageRef, file);
-            const imageUrl = await getDownloadURL(storageRef);
-
-            status.innerText = "🧛‍♂️ Фото загружено! Сохраняем...";
+            const imageUrl = await uploadToImgbb(file);
 
             await addDoc(collection(db, "participants"), {
                 name,
@@ -211,11 +227,10 @@
             });
 
             status.innerText = "🎃 Успех! Твой костюм в галерее.";
-            document.getElementById("username").value = "";
-            document.getElementById("photo").value = "";
 
             localStorage.setItem("uploaded", "true");
             updateScreenState();
+
         } catch (err) {
             console.error(err);
             status.innerText = "❌ Ошибка загрузки.";
@@ -255,7 +270,6 @@
 
     /* ---------- ГОЛОСОВАНИЕ ---------- */
     window.vote = async (id) => {
-        // защита по устройству
         if (localStorage.getItem("halloween_voted")) {
             alert("Вы уже голосовали с этого устройства!");
             return;
@@ -263,7 +277,6 @@
 
         const userIP = await getUserIP();
 
-        // защита: 1 IP = 1 голос
         const voteCheckQuery = query(collection(db, "votes"), where("ip", "==", userIP));
         const voteCheckSnap = await getDocs(voteCheckQuery);
 
@@ -284,6 +297,7 @@
 
             localStorage.setItem("halloween_voted", "true");
             updateScreenState();
+
         } catch (err) {
             console.error(err);
             alert("Ошибка голосования.");
