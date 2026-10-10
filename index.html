@@ -1,417 +1,210 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Путь Самурая</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Хэллоуинский Конкурс Костюмов 🎃</title>
 
-<style>
-    body {
-        margin: 0;
-        padding: 0;
-        font-family: "Segoe UI", sans-serif;
-        background: #000;
-        color: #e6e6e6;
-        overflow: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-    }
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #fa7921;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+        h1, h2 { color: #e65c00; text-shadow: 2px 2px 4px #000; }
+        .section {
+            background: #262626;
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #fa7921;
+            box-shadow: 0 0 15px rgba(250, 121, 33, 0.3);
+        }
+        input, button {
+            width: 90%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #fa7921;
+            font-size: 16px;
+        }
+        input { background: #333; color: #fff; }
+        button {
+            background: #fa7921;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover { background: #e65c00; box-shadow: 0 0 10px #fa7921; }
+        button:disabled { background: #555; color: #888; cursor: not-allowed; }
 
-    .neo-symbols {
-        position: fixed;
-        inset: 0;
-        pointer-events: none;
-        z-index: 0;
-        background:
-            repeating-linear-gradient(
-                90deg,
-                rgba(255,0,0,0.08) 0px,
-                rgba(255,0,0,0.08) 2px,
-                transparent 2px,
-                transparent 8px
-            ),
-            repeating-linear-gradient(
-                0deg,
-                rgba(255,0,0,0.05) 0px,
-                rgba(255,0,0,0.05) 2px,
-                transparent 2px,
-                transparent 8px
-            );
-        animation: gridMove 12s linear infinite;
-        transition: transform 0.2s ease-out;
-    }
-
-    @keyframes gridMove {
-        from { transform: translateX(0); }
-        to { transform: translateX(-200px); }
-    }
-
-    .card {
-        background: rgba(10,10,10,0.85);
-        border: 1px solid rgba(255,0,0,0.3);
-        padding: 35px 25px;
-        border-radius: 14px;
-        box-shadow: 0 0 40px rgba(255,0,0,0.25);
-        text-align: center;
-        max-width: 420px;
-        width: 90%;
-        backdrop-filter: blur(6px);
-        position: relative;
-        z-index: 2;
-        animation: fadeIn 0.8s ease-out forwards;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(30px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .btn {
-        padding: 14px 28px;
-        background: rgba(255,0,0,0.25);
-        border: 1px solid rgba(255,0,0,0.6);
-        color: #ff4d4d;
-        border-radius: 50px;
-        font-weight: bold;
-        text-decoration: none;
-        cursor: pointer;
-        display: inline-block;
-        margin-top: 20px;
-        box-shadow: 0 0 20px rgba(255,0,0,0.35);
-        transition: 0.3s;
-    }
-
-    .btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 0 35px rgba(255,0,0,0.6);
-    }
-
-    #modal {
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.7);
-        display: none;
-        justify-content: center;
-        align-items: center;
-        z-index: 3;
-    }
-
-    .modal-content {
-        background: #111;
-        padding: 25px;
-        border-radius: 12px;
-        text-align: center;
-        width: 80%;
-        max-width: 350px;
-        border: 1px solid rgba(255,0,0,0.3);
-        box-shadow: 0 0 25px rgba(255,0,0,0.4);
-    }
-
-    .modal-btn {
-        padding: 10px 20px;
-        margin: 10px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: bold;
-    }
-
-    .confirm {
-        background: #b30000;
-        color: white;
-    }
-
-    .cancel {
-        background: #444;
-        color: white;
-    }
-
-    .countdown-container {
-        display: flex;
-        justify-content: space-around;
-        margin: 25px 0 15px;
-    }
-
-    .countdown-item {
-        background: rgba(255,0,0,0.05);
-        border: 1px solid rgba(255,0,0,0.4);
-        border-radius: 10px;
-        padding: 10px;
-        min-width: 65px;
-        box-shadow: 0 0 15px rgba(255,0,0,0.25);
-        text-align: center;
-    }
-
-    .countdown-time {
-        font-size: 30px;
-        font-weight: 700;
-        color: #ff1a1a;
-        font-family: "Consolas", monospace;
-        text-shadow: 0 0 10px rgba(255,0,0,0.6);
-    }
-
-    .countdown-label {
-        font-size: 12px;
-        color: #aaa;
-        margin-top: 5px;
-        display: block;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    .coordinates {
-        font-size: 26px;
-        font-weight: 800;
-        color: #ff1a1a;
-        margin: 20px 0;
-        background: rgba(255,0,0,0.1);
-        padding: 15px;
-        border-radius: 8px;
-        border: 1px dashed rgba(255,0,0,0.4);
-    }
-
-    #finalBlock {
-        display: none;
-        color: #fff;
-        text-shadow: 0 0 12px rgba(255,0,0,0.7);
-    }
-
-    .samurai-title {
-        font-size: 32px;
-        font-weight: 900;
-        color: #ff1a1a;
-        text-shadow: 0 0 20px rgba(255,0,0,0.7);
-        animation: pulse 2.5s ease-in-out infinite;
-        letter-spacing: 3px;
-    }
-
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.07); }
-        100% { transform: scale(1); }
-    }
-
-    .kanji {
-        font-size: 60px;
-        color: #ff1a1a;
-        opacity: 0;
-        animation: kanjiAppear 3s ease-out forwards 1.5s;
-    }
-
-    @keyframes kanjiAppear {
-        0% { transform: translateY(20px); opacity: 0; }
-        100% { transform: translateY(0); opacity: 1; }
-    }
-
-    @media (max-width: 480px) {
-        .card { padding: 25px 20px; width: 92%; }
-        .countdown-time { font-size: 24px; }
-        .coordinates { font-size: 22px; padding: 12px; }
-        .btn { padding: 12px 20px; font-size: 15px; }
-        .samurai-title { font-size: 26px; }
-        .kanji { font-size: 48px; }
-    }
-</style>
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .card {
+            background: #262626;
+            border: 1px solid #fa7921;
+            border-radius: 8px;
+            width: 250px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        }
+        .card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .votes-count {
+            font-size: 18px;
+            font-weight: bold;
+            color: #00cc66;
+            margin: 10px 0;
+        }
+    </style>
 </head>
 <body>
 
-<div class="neo-symbols" id="bg"></div>
+<h1>🎃 Хэллоуинский Конкурс 👻</h1>
 
-<div class="card">
-
-    <div id="start">
-        <p style="font-size: 18px; line-height: 1.6;">
-            Путь клинка начинается не с удара — а с подготовки.<br>
-            Сегодня тебе понадобится больше, чем решимость.<br><br>
-            Возьми лопату, удочку и активируй главное — свой боевой дух. Без него миссия не начнётся.<br><br>
-            Испытание ждёт тех, кто готов идти до конца.
-        </p>
-
-        <div class="btn" onclick="openModal()">Готов</div>
-
-        <p style="font-size: 13px; color:#888; margin-top:10px;">
-            Доступ появится после 16:30
-        </p>
-    </div>
-
-    <div id="timerBlock" style="display:none;">
-        <div class="coordinates">54.020311, 27.246313</div>
-
-        <a class="btn"
-           href="https://yandex.ru/maps?whatshere%5Bpoint%5D=27.246313%2C54.020311&whatshere%5Bzoom%5D=16.0&ll=27.24631299999999%2C54.020310998935194&z=16.0&si=b0r36t6ycn8knngkgbk9pef0nc"
-           target="_blank">
-            Открыть в Яндекс.Картах
-        </a>
-
-        <p style="font-size: 16px; margin-top: 20px; line-height: 1.5;">
-            Координаты получены.<br>
-            На месте тебя ждёт то, что скрыто под землёй.<br>
-            Время летит, как выпущенная стрела — успей добраться до цели до 17:30.
-        </p>
-
-        <div class="countdown-container">
-            <div class="countdown-item">
-                <span id="days" class="countdown-time">00</span>
-                <span class="countdown-label">дн</span>
-            </div>
-            <div class="countdown-item">
-                <span id="hours" class="countdown-time">00</span>
-                <span class="countdown-label">час</span>
-            </div>
-            <div class="countdown-item">
-                <span id="minutes" class="countdown-time">00</span>
-                <span class="countdown-label">мин</span>
-            </div>
-            <div class="countdown-item">
-                <span id="seconds" class="countdown-time">00</span>
-                <span class="countdown-label">сек</span>
-            </div>
-        </div>
-    </div>
-
-    <div id="finalBlock">
-        <div class="samurai-title">Миссия выполнена</div>
-        <div style="font-size: 18px; line-height: 1.6;">
-            <br>Ты прошёл путь клинка.<br><br>
-            Испытание окончено — награда у тебя в руках.<br>
-        </div>
-        <div class="kanji">侍の道</div>
-    </div>
-
+<div class="section">
+    <h2>Шаг 1: Загрузи свой образ</h2>
+    <input type="text" id="username" placeholder="Введи свое имя или ник" required>
+    <input type="file" id="photo" accept="image/*" required>
+    <button id="uploadBtn">Участвовать!</button>
+    <p id="status" style="color: #fff;"></p>
 </div>
 
-<div id="modal">
-    <div class="modal-content">
-        <p id="modal-text">Ты готов ступить на путь?</p>
-        <div class="modal-btn confirm" onclick="confirmStart()">Да</div>
-        <div class="modal-btn cancel" onclick="closeModal()">Отмена</div>
-    </div>
-</div>
+<h2>Шаг 2: Голосование за лучший костюм</h2>
+<div class="gallery" id="gallery"></div>
 
-<script>
-/* ФОН */
-const bg = document.getElementById("bg");
+<script type="module">
+    /* ---------- Firebase ---------- */
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import {
+        getFirestore, collection, addDoc, onSnapshot,
+        updateDoc, doc, increment, query, orderBy
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-function moveBG(x, y) {
-    const dx = (x / window.innerWidth - 0.5) * 20;
-    const dy = (y / window.innerHeight - 0.5) * 20;
-    bg.style.transform = `translate(${dx}px, ${dy}px)`;
-}
+    const firebaseConfig = {
+        apiKey: "AIzaSyDkyFraWVn_Hp9tTZWGIKOeNFQKpAUzqSw",
+        authDomain: "halloween-ab861.firebaseapp.com",
+        projectId: "halloween-ab861",
+        storageBucket: "halloween-ab861.firebasestorage.app",
+        messagingSenderId: "916753639549",
+        appId: "1:916753639549:web:935dfb4a96af629625e914"
+    };
 
-document.addEventListener("mousemove", e => moveBG(e.clientX, e.clientY));
-document.addEventListener("touchmove", e => {
-    const t = e.touches[0];
-    moveBG(t.clientX, t.clientY);
-});
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-/* МОДАЛКА */
-function openModal() {
-    document.getElementById('modal-text').innerText = "Ты готов ступить на путь?";
-    document.getElementById('modal').style.display = 'flex';
-}
+    /* ---------- Imgbb ---------- */
+    const IMGBB_API_KEY = "40e3654baeb45b49e49e95961a64c5aa";
 
-function closeModal() {
-    document.getElementById('modal').style.display = 'none';
-}
+    /* ---------- Upload participant ---------- */
+    document.getElementById("uploadBtn").onclick = async () => {
+        const name = document.getElementById("username").value.trim();
+        const file = document.getElementById("photo").files[0];
+        const status = document.getElementById("status");
+        const btn = document.getElementById("uploadBtn");
 
-/* ТАЙМЕР */
-let countdownInterval;
-let targetDate = null;
+        if (!name || !file) {
+            alert("Введите имя и выберите фото!");
+            return;
+        }
 
-/* --- РЕАЛЬНОЕ ВРЕМЯ ЧЕРЕЗ ИНТЕРНЕТ --- */
-async function getRealTime() {
-    try {
-        const response = await fetch(
-            "https://timeapi.io/api/Time/current/zone?timeZone=Europe/Minsk"
-        );
+        btn.disabled = true;
+        status.innerText = "🧙‍♂️ Загружаем фото...";
 
-        const data = await response.json();
+        try {
+            const formData = new FormData();
+            formData.append("image", file);
 
-        return new Date(
-            data.year,
-            data.month - 1,
-            data.day,
-            data.hour,
-            data.minute,
-            data.seconds
-        );
-    } catch (e) {
-        console.error("Ошибка получения времени:", e);
-        return null;
-    }
-}
+            const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                method: "POST",
+                body: formData
+            });
 
-/* --- ПОДТВЕРЖДЕНИЕ СТАРТА --- */
-async function confirmStart() {
-    const realNow = await getRealTime();
+            const result = await response.json();
 
-    if (!realNow) {
-        document.getElementById('modal-text').innerText =
-            "Не удалось получить время. Попробуй ещё раз.";
-        return;
-    }
+            if (!result.success) throw new Error("Ошибка загрузки на Imgbb");
 
-    const minStart = new Date(realNow);
-    minStart.setHours(16, 07, 0, 0);
+            const imageUrl = result.data.url;
 
-    if (realNow < minStart) {
-        document.getElementById('modal-text').innerText =
-            "Путь откроется после 16:30.";
-        return;
-    }
+            status.innerText = "🧛‍♂️ Фото загружено! Сохраняем...";
 
-    closeModal();
-    beginTimer(realNow);
-}
+            await addDoc(collection(db, "participants"), {
+                name,
+                imageUrl,
+                votes: 0,
+                createdAt: Date.now()
+            });
 
-/* --- ЗАПУСК ТАЙМЕРА --- */
-async function beginTimer(realNow) {
-    document.getElementById('start').style.display = 'none';
-    document.getElementById('timerBlock').style.display = 'block';
+            status.innerText = "🎃 Успех! Твой костюм в галерее.";
+            document.getElementById("username").value = "";
+            document.getElementById("photo").value = "";
+        } catch (err) {
+            console.error(err);
+            status.innerText = "❌ Ошибка загрузки.";
+        }
 
-    targetDate = new Date(realNow);
-    targetDate.setHours(17, 07, 0, 0);
+        btn.disabled = false;
+    };
 
-    if (realNow >= targetDate) {
-        showFinal();
-        return;
-    }
+    /* ---------- Gallery ---------- */
+    const gallery = document.getElementById("gallery");
+    const q = query(collection(db, "participants"), orderBy("votes", "desc"));
 
-    updateTimer();
-    countdownInterval = setInterval(updateTimer, 1000);
-}
+    onSnapshot(q, (snapshot) => {
+        gallery.innerHTML = "";
+        const hasVoted = localStorage.getItem("halloween_voted");
 
-/* --- ОБНОВЛЕНИЕ ТАЙМЕРА --- */
-async function updateTimer() {
-    const realNow = await getRealTime();
+        snapshot.forEach((docSnap) => {
+            const p = docSnap.data();
+            const id = docSnap.id;
 
-    if (!realNow) return;
+            const card = document.createElement("div");
+            card.className = "card";
 
-    const distance = targetDate - realNow;
+            const action = hasVoted
+                ? `<div class="votes-count">💀 Голосов: ${p.votes}</div>`
+                : `<button onclick="vote('${id}')">🎃 Проголосовать</button>`;
 
-    if (distance <= 0) {
-        clearInterval(countdownInterval);
-        showFinal();
-        return;
-    }
+            card.innerHTML = `
+                <img src="${p.imageUrl}">
+                <h3>${p.name}</h3>
+                ${action}
+            `;
 
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            gallery.appendChild(card);
+        });
+    });
 
-    document.getElementById("days").innerText = days.toString().padStart(2, "0");
-    document.getElementById("hours").innerText = hours.toString().padStart(2, "0");
-    document.getElementById("minutes").innerText = minutes.toString().padStart(2, "0");
-    document.getElementById("seconds").innerText = seconds.toString().padStart(2, "0");
-}
+    /* ---------- Vote ---------- */
+    window.vote = async (id) => {
+        if (localStorage.getItem("halloween_voted")) {
+            alert("Вы уже голосовали!");
+            return;
+        }
 
-/* --- ФИНАЛ --- */
-function showFinal() {
-    document.getElementById('timerBlock').style.display = 'none';
-    document.getElementById('finalBlock').style.display = 'block';
-}
+        try {
+            const ref = doc(db, "participants", id);
+            await updateDoc(ref, { votes: increment(1) });
+            localStorage.setItem("halloween_voted", "true");
+        } catch (err) {
+            console.error(err);
+            alert("Ошибка голосования.");
+        }
+    };
 </script>
 
 </body>
